@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal de Transporte - Panel de Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo h2 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .nav-menu {
+            margin-top: 30px;
+        }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255,255,255,0.1);
+            border-left: 3px solid var(--secondary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 300px;
+        }
+        
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 5px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .card-icon.buses {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary);
+        }
+        
+        .card-icon.rutas {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .card-icon.terminales {
+            background-color: rgba(155, 89, 182, 0.2);
+            color: #9b59b6;
+        }
+        
+        .card-icon.usuarios {
+            background-color: rgba(230, 126, 34, 0.2);
+            color: #e67e22;
+        }
+        
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .card-title {
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        /* Main Sections */
+        .section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        /* Gallery Section */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 150px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            padding: 10px;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2><i class="fas fa-bus"></i> Sistema 
+                    Transporte 
+                    Intermunicipal </h2>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-route"></i> Rutas
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-bus"></i> Buses
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-ticket-alt"></i> Boletos
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-map-marked-alt"></i> GPS
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i> Reportes
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i> Configuración
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar...">
+                </div>
+                
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <span>Admin</span>
+                </div>
+            </div>
+            
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value">42</div>
+                            <div class="card-title">Buses activos</div>
+                        </div>
+                        <div class="card-icon buses">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value">18</div>
+                            <div class="card-title">Rutas registradas</div>
+                        </div>
+                        <div class="card-icon rutas">
+                            <i class="fas fa-route"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value">3</div>
+                            <div class="card-title">Terminales</div>
+                        </div>
+                        <div class="card-icon terminales">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-value">1,248</div>
+                            <div class="card-title">Boletos hoy</div>
+                        </div>
+                        <div class="card-icon usuarios">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rutas Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">Rutas Disponibles</h3>
+                    <button class="btn btn-outline">Ver todas</button>
+                </div>
+                
+                <div class="gallery" id="routes-gallery">
+                    <!-- Las imágenes de rutas se cargarán aquí con JavaScript -->
+                </div>
+                
+                <div class="gallery-controls">
+                    <button class="btn btn-primary" id="prev-btn"><i class="fas fa-chevron-left"></i> Anterior</button>
+                    <button class="btn btn-primary" id="next-btn">Siguiente <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Buses Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">Buses en Ruta</h3>
+                    <button class="btn btn-outline">Ver todos</button>
+                </div>
+                
+                <div class="gallery" id="buses-gallery">
+                    <!-- Las imágenes de buses se cargarán aquí con JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para las rutas
+        const routesData = [
+            {
+                id: 1,
+                name: "Ruta Urbana 1",
+                image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                type: "Urbana",
+                stops: 15
+            },
+{
+    id: 2,
+    name: "Ruta Intermunicipal 2",
+    image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    type: "Intermunicipal",
+    stops: 8
+},
+
+{
+    id: 3,
+    name: "Ruta Turística 3",
+    image: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    type: "Turística",
+    stops: 5
+},
+            {
+                id: 4,
+                name: "Ruta Express 4",
+                image: "https://images.unsplash.com/photo-1502877338535-766e1452684a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                type: "Express",
+                stops: 3
+            },
+            {
+                id: 5,
+                name: "Ruta Nocturna 5",
+                image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                type: "Nocturna",
+                stops: 10
+            }
+        ];
+        
+        // Datos de ejemplo para los buses
+        const busesData = [
+            {
+                id: 101,
+                plate: "ABC-123",
+                image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                route: "Ruta Urbana 1",
+                status: "En ruta"
+            },
+            {
+                id: 102,
+                plate: "DEF-456",
+                image: "https://images.unsplash.com/photo-1557223562-6c77ef16210f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                route: "Ruta Intermunicipal 2",
+                status: "En terminal"
+            },
+            {
+                id: 103,
+                plate: "GHI-789",
+                image: "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                route: "Ruta Turística 3",
+                status: "En mantenimiento"
+            },
+            {
+                id: 104,
+                plate: "JKL-012",
+                image: "https://images.unsplash.com/photo-1501700493788-fa1a4fc9fe62?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                route: "Ruta Express 4",
+                status: "En ruta"
+            }
+        ];
+        
+        // Función para cargar las imágenes de rutas
+        function loadRoutesGallery() {
+            const gallery = document.getElementById('routes-gallery');
+            gallery.innerHTML = '';
+            
+            routesData.forEach(route => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `
+                    <img src="${route.image}" alt="${route.name}">
+                    <div class="gallery-overlay">
+                        <h4>${route.name}</h4>
+                        <p>${route.type} - ${route.stops} paradas</p>
+                    </div>
+                `;
+                
+                // Agregar evento de clic
+                item.addEventListener('click', () => {
+                    alert(`Seleccionaste: ${route.name}\nTipo: ${route.type}\nParadas: ${route.stops}`);
+                });
+                
+                gallery.appendChild(item);
+            });
+        }
+        
+        // Función para cargar las imágenes de buses
+        function loadBusesGallery() {
+            const gallery = document.getElementById('buses-gallery');
+            gallery.innerHTML = '';
+            
+            busesData.forEach(bus => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `
+                    <img src="${bus.image}" alt="${bus.plate}">
+                    <div class="gallery-overlay">
+                        <h4>${bus.plate}</h4>
+                        <p>${bus.route} - ${bus.status}</p>
+                    </div>
+                `;
+                
+                // Agregar evento de clic
+                item.addEventListener('click', () => {
+                    alert(`Bus: ${bus.plate}\nRuta: ${bus.route}\nEstado: ${bus.status}`);
+                });
+                
+                gallery.appendChild(item);
+            });
+        }
+        
+        // Cargar las galerías al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRoutesGallery();
+            loadBusesGallery();
+            
+            // Eventos para los botones de navegación
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                alert('Mostrando rutas anteriores...');
+                // Aquí iría la lógica para cargar el conjunto anterior de rutas
+            });
+            
+            document.getElementById('next-btn').addEventListener('click', () => {
+                alert('Mostrando siguientes rutas...');
+                // Aquí iría la lógica para cargar el siguiente conjunto de rutas
+            });
+            
+            // Eventos para los items del menú
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Aquí iría la lógica para cargar la sección correspondiente
+                    const sectionName = this.textContent.trim();
+                    alert(`Cargando sección: ${sectionName}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
